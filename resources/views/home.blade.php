@@ -1,29 +1,80 @@
 @extends('master')
-@section('title', 'Home')
-@section('body')
-<div class="col-md-8 offset-md-2 mt-5">
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body p-4 text-center">
-            <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
-            
-            <h2 class="mt-3 fw-bold">Selamat datang, {{ Auth::user()->name }}!</h2>
-            <p class="text-muted mb-4">Email aktif: {{ Auth::user()->email }}</p>
-            
-            <hr class="my-4">
 
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <a href="{{ route('post.index') }}" class="btn btn-primary btn-lg px-4 me-md-2">
-                    <i class="bi bi-newspaper"></i> Masuk Ke Portal Berita
-                </a>
-                
-                <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-danger btn-lg px-4">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </button>
-                </form>
-            </div>
+@section('title', 'Berita - Kabar Burung')
+
+@section('body')
+<div class="container my-4">
+    <div class="border-bottom pb-2 mb-4">
+        <h4 class="fw-bold text-uppercase text-secondary">Berita Utama</h4>
+    </div>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    @endif
+
+    @auth
+        <div class="mb-4">
+            <a href="{{ route('post.create') }}" class="btn btn-success fw-bold">
+                <i class="bi bi-plus-lg"></i> Tambah Berita Baru
+            </a>
+        </div>
+    @endauth
+
+    <div class="row">
+        @forelse ($posts as $post)
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                    <img src="https://picsum.photos/seed/{{ $post->id }}/600/400" class="card-img-top" alt="Berita Image" style="height: 200px; object-fit: cover;">
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-danger-subtle text-danger text-uppercase fw-bold" style="font-size: 0.75rem;">
+                                {{ $post->published == 'yes' ? 'Published' : 'Draft' }}
+                            </span>
+                        </div>
+
+                        <h5 class="card-title fw-bold mb-3">
+                            <a href="{{ route('post.show', $post->id) }}" class="text-dark text-decoration-none hover-primary">
+                                {{ $post->title }}
+                            </a>
+                        </h5>
+
+                        <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem; line-height: 1.6;">
+                            {{ Str::limit($post->content, 120, '...') }}
+                        </p>
+
+                        <hr class="text-muted my-3">
+
+                        <div class="d-flex justify-content-between align-items-center text-muted" style="font-size: 0.8rem;">
+                            <span>Oleh: <strong>Admin</strong></span>
+                            <span>{{ $post->created_at->diffForHumans() }}</span>
+                        </div>
+
+                        @auth
+                            <div class="mt-3 pt-2 border-top d-flex justify-content-end">
+                                <a href="{{ route('post.edit', $post->id) }}" class="btn btn-warning btn-sm text-white me-2">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <form action="{{ route('post.destroy', $post->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus berita ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        @endauth
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-12 text-center py-5">
+                <p class="text-muted fs-5">Belum ada berita yang tersedia.</p>
+            </div>
+        @endforelse
     </div>
 </div>
 @stop
