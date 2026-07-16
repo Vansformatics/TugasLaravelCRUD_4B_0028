@@ -1,49 +1,63 @@
 @extends('master')
-@section('title', 'Halaman Utama Portal - Kabar Burung')
+@section('title', 'Halaman Utama Berita - Kabar Burung')
 @section('body')
-<div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-    <h1>Portal - Kabar Burung</h1>
-    <a href="{{ route('post.create') }}" class="btn btn-success">+ Tambah Post</a>
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h1>Berita - Kabar Burung</h1>
+    <a href="{{ route('post.create') }}" class="btn btn-success"><i class="bi bi-plus-lg"></i> Tambah Berita Baru</a>
 </div>
 
 @if(session('success'))
-<div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 @endif
-<table class="table table-hover table-striped">
-    <thead>
+
+<table class="table table-hover table-striped shadow-sm rounded">
+    <thead class="table-dark">
         <tr>
             <th>No</th>
             <th>Title</th>
             <th>Published</th>
             <th>Tanggal</th>
-            <th>Aksi</th>
-        </tr>
+            <th>Aksi</th> </tr>
     </thead>
     <tbody>
+        @php $no = 0; @endphp
+        @forelse ($posts as $post) {{-- Menggunakan variabel $posts dari Controller --}}
+            @php $no++; @endphp
+            <tr>
+                <td>{{ $no }}</td>
+                <td>
+                    <a href="{{ route('post.show', $post->id) }}" class="fw-bold text-decoration-none text-dark">
+                        {{ $post->title }}
+                    </a>
+                </td>
+                <td>
+                    <span class="badge {{ $post->published == 'yes' ? 'bg-success' : 'bg-secondary' }}">
+                        {{ strtoupper($post->published) }}
+                    </span>
+                </td>
+                <td>{{ $post->created_at->format('M d, Y') }}</td>
+                <td>
+                    <a href="{{ route('post.edit', $post->id) }}" class="btn btn-warning btn-sm text-white">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
 
-        <?php $no=0 ?>
-
-        @foreach ($posts as $post)
-
-        <?php $no++ ?>
-
-        <tr>
-            <td>{{ $no }}</td>
-            <td>{{ $post->title }}</td>
-            <td>{{ $post->published }}</td>
-            <td>{{ $post->created_at->format('M d, Y') }}</td>
-            <td>
-                <a href="{{ route('post.show', $post->id) }}" class="btn btn-info btn-sm">Detail</a>
-                <a href="{{ route('post.edit', $post->id) }}" class="btn btn-primary btn-sm">Edit</a>
-                <form action="{{ route('post.destroy', $post->id) }}" method="POST" class="d-inline" 
-                                onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                </form>
-            </td>
-        </tr>
-        @endforeach
+                    <form action="{{ route('post.destroy', $post->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> Hapus
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">Belum ada data berita.</td>
+            </tr>
+        @endforelse
     </tbody>
 </table>
 @stop
