@@ -31,7 +31,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect('/home');
+        return redirect('/');
     }
 
     // Tampilkan form login
@@ -50,7 +50,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect('/home');
+            return redirect('/');
         }
 
         return back()->withErrors([
