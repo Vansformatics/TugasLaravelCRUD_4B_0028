@@ -1,9 +1,16 @@
 @extends('master')
+
 @section('title', 'Halaman Utama Berita - Kabar Burung')
+
 @section('body')
 <div class="d-flex justify-content-between align-items-center my-4">
     <h1>Berita - Kabar Burung</h1>
-    <a href="{{ route('post.create') }}" class="btn btn-success"><i class="bi bi-plus-lg"></i> Tambah Berita Baru</a>
+    
+    @auth
+        <a href="{{ route('post.create') }}" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Tambah Berita Baru
+        </a>
+    @endauth
 </div>
 
 @if(session('success'))
@@ -20,11 +27,12 @@
             <th>Title</th>
             <th>Published</th>
             <th>Tanggal</th>
-            <th>Aksi</th> </tr>
+            <th>Aksi</th> 
+        </tr>
     </thead>
     <tbody>
         @php $no = 0; @endphp
-        @forelse ($posts as $post) {{-- Menggunakan variabel $posts dari Controller --}}
+        @forelse ($posts as $post)
             @php $no++; @endphp
             <tr>
                 <td>{{ $no }}</td>
@@ -40,17 +48,23 @@
                 </td>
                 <td>{{ $post->created_at->format('M d, Y') }}</td>
                 <td>
-                    <a href="{{ route('post.edit', $post->id) }}" class="btn btn-warning btn-sm text-white">
-                        <i class="bi bi-pencil-square"></i> Edit
+                    <a href="{{ route('post.show', $post->id) }}" class="btn btn-info btn-sm text-white me-1">
+                        <i class="bi bi-eye"></i> Detail
                     </a>
 
-                    <form action="{{ route('post.destroy', $post->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="bi bi-trash"></i> Hapus
-                        </button>
-                    </form>
+                    @auth
+                        <a href="{{ route('post.edit', $post->id) }}" class="btn btn-warning btn-sm text-white me-1">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </a>
+
+                        <form action="{{ route('post.destroy', $post->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Hapus
+                            </button>
+                        </form>
+                    @endauth
                 </td>
             </tr>
         @empty
