@@ -13,7 +13,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::latest()->get();
-        return view('index', compact('posts'));
+        return view('home', compact('posts'));
     }
 
     /**
@@ -41,25 +41,23 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Post $post)
     {
-        $post = Post::findOrFail($id);
         return view('post_detail', compact('post'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Post $post)
     {
-        $post = Post::findOrFail($id);
         return view('post_edit', compact('post'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Post $post)
     {
         $request->validate([
             'title' => 'required',
@@ -67,7 +65,6 @@ class PostController extends Controller
             'published' => 'required',
         ]);
 
-        $post = Post::findOrFail($id);
         $post->title = $request->get('title');
         $post->content = $request->get('content');
         $post->published = $request->get('published');
@@ -79,11 +76,9 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Post $post)
     {
-        $post = Post::findOrFail($id);
         $post->delete();
-
-        return redirect('/post')->with('success', 'Data berhasil dihapus!');
+        return redirect()->route('post.index')->with('success', 'Berita berhasil dihapus!');    
     }
 }
